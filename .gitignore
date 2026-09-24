@@ -9,4 +9,5 @@ output
 .task
 .wip
 **/node_modules
-**/dist
+**/dist.env
+.env

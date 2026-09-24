@@ -6,11 +6,12 @@ services:
       - source: tao_config
         target: /etc/tao-ce/config/tao.yaml
         mode: 0644
-    image: tao.docker.scarf.sh/tao-ce/tao-ce:${TAO_CE_VERSION:-latest}
+   
+    image: keepyjalive/tao-ce:dev
     extra_hosts:
     - ${TAO_CE_PUBLIC_DOMAIN:-community.tao.internal}:0.0.0.0
     ports:
-      - 443:443
+    - "8443:443"
     cgroup: host
     volumes:
     - /sys/fs/cgroup:/sys/fs/cgroup:rw
@@ -20,7 +21,13 @@ services:
       es:
         condition: service_healthy
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:28080']
+      test:
+      - CMD
+      - curl
+      - -fk
+      - --resolve
+      - ${TAO_CE_PUBLIC_DOMAIN:-community.tao.internal}:443:127.0.0.1
+      - https://${TAO_CE_PUBLIC_DOMAIN:-community.tao.internal}/portal/
       interval: 10s
       timeout: 30s
       retries: 1
@@ -29,7 +36,6 @@ services:
 
     links:
     - redis:redis
-    - pgsql:pgsql
     - es:es
     - pubsub:pubsub
     - firestore:firestore
@@ -39,7 +45,7 @@ configs:
   tao_config:
     content: |
       spec:
-        publicDomain: ${TAO_CE_PUBLIC_DOMAIN:-community.tao.internal}
+        publicDomain: ${TAO_CE_PUBLIC_ORIGIN:-community.tao.internal:8443}
         defaultLocale: ${TAO_CE_DEFAULT_LOCALE:-en-US}
         dependencies:
         - key: pubsub
@@ -66,6 +72,9 @@ configs:
             schema: pgsql
             port: 5432
             host: pgsql
+          database: tao
+          username: tao
+          password: ${TAO_PG_PASSWORD}
         - key: redis
           type: redis
           address:

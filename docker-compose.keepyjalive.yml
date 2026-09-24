@@ -1,0 +1,9 @@
+services:
+  tao:
+    networks:
+      - default
+      - keepyjalive-dev
+
+networks:
+  keepyjalive-dev:
+    external: true

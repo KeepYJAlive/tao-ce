@@ -1,0 +1,14 @@
+FROM tao.docker.scarf.sh/tao-ce/tao-ce:latest
+
+COPY patches/construct-seed.libsonnet \
+  /usr/local/libexec/tao-ce/setup/apps/files/construct-seed.libsonnet
+
+COPY patches/scoring.libsonnet \
+  /usr/local/libexec/tao-ce/setup/apps/scoring.libsonnet
+
+RUN sed -i \
+      "/TAO_CE_PUBLIC_DOMAIN: this.publicDomain,/a\\      TAO_CE_PUBLIC_HOST: std.split(this.publicDomain, ':')[0]," \
+      /usr/local/libexec/tao-ce/setup/main.jsonnet \
+    && sed -i \
+      '1s/TAO_CE_PUBLIC_DOMAIN/TAO_CE_PUBLIC_HOST/' \
+      /etc/tao-ce/config/Caddyfile
