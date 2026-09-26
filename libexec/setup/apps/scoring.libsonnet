@@ -17,7 +17,12 @@ function(setup)
         APP_DEBUG: 'false',
         APP_ROUTE_PREFIX: '/',
         APP_HOST: 'https://%(publicDomain)s/ms-be' % setup,
-        DATABASE_URL: 'pgsql://postgres:postgres@%(host)s:%(port)s/manual_scoring' % setup.dependencies.pgsql.address,
+        DATABASE_URL: 'pgsql://%(username)s:%(password)s@%(host)s:%(port)s/manual_scoring' % {
+          username: setup.dependencies.pgsql.username,
+          password: setup.dependencies.pgsql.password,
+          host: setup.dependencies.pgsql.address.host,
+          port: setup.dependencies.pgsql.address.port,
+        },
         CORS_ALLOW_ORIGIN: '.*',
         REDIS_CACHE_DSN: 'redis://%(host)s:%(port)s' % setup.dependencies.redis.address,
 
@@ -76,8 +81,12 @@ function(setup)
       service: {
         APP_ENV: 'dev',
         APP_DEBUG: 'false',
-        DATABASE_URL: 'pgsql://postgres:postgres@%(host)s:%(port)s/scoring_service' % setup.dependencies.pgsql.address,
-
+       DATABASE_URL: 'pgsql://%(username)s:%(password)s@%(host)s:%(port)s/scoring_service' % {
+          username: setup.dependencies.pgsql.username,
+          password: setup.dependencies.pgsql.password,
+          host: setup.dependencies.pgsql.address.host,
+          port: setup.dependencies.pgsql.address.port,
+        },
         SCORING_ENGINE_COMPONENT_IDENTIFIERS: '',
         EM_SIDECAR_HOST: setup.apps['environment-management'].auth_server.grpc.host,
         EM_SIDECAR_PORT: setup.apps['environment-management'].auth_server.grpc.port,

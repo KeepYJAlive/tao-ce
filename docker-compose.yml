@@ -70,10 +70,10 @@ configs:
           type: pgsql
           address:
             schema: pgsql
-            port: 5432
-            host: pgsql
-          database: tao
-          username: tao
+            port: ${TAO_PG_PORT:-5432}
+            host: ${TAO_PG_HOST:-pgsql}
+          database: ${TAO_PG_DATABASE:-tao}
+          username: ${TAO_PG_USER:-tao}
           password: ${TAO_PG_PASSWORD}
         - key: redis
           type: redis

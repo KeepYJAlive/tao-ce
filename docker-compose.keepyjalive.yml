@@ -1,5 +1,7 @@
 services:
   tao:
+    ports:
+      - "8443:443"
     networks:
       - default
       - keepyjalive-dev

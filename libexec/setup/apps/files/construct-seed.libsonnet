@@ -79,9 +79,9 @@ function(setup)
           default: {
             driver: 'pdo_pgsql',
             host: setup.dependencies.pgsql.address.host,
-            dbname: 'postgres',
-            user: 'postgres',
-            password: 'postgres',
+            dbname: setup.dependencies.pgsql.database,
+            user: setup.dependencies.pgsql.username,
+            password: setup.dependencies.pgsql.password,
           },
           cache: { driver: 'phpfile' },
           deliveryExecution: redis,
