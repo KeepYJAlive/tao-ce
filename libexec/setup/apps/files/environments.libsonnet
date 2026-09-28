@@ -279,7 +279,16 @@ function(setup)
             oidcAuthenticationUrl: 'http://foo.bar',
             isInternal: true,
           },
+          {
+            audience: 'https://opportunities.keepyjalive.org',
+            id: 'harly-platform',
+            isInternal: false,
+            name: 'Harly LTI Platform',
+            oauth2AccessTokenUrl: 'https://opportunities.keepyjalive.org/api/integrations/tao/lti/token',
+            oidcAuthenticationUrl: 'https://opportunities.keepyjalive.org/api/integrations/tao/lti/authorize',
+          },
         ],
+
         ltiRegistrations: [
           {
             clientId: 'lti-devkit-deliver-#tenantId#',
@@ -421,6 +430,19 @@ function(setup)
             toolKeyChain: {
             },
             deploymentIds: ['1'],
+          },
+          {
+            clientId: 'harly-tao-f3695cee-3122-4e89-a2ce-c0c4ef364718',
+            deploymentIds: [
+              'f0d717d2-02ff-468e-bfea-e59c65ce4e75',
+            ],
+            id: 'lti-harly-deliver-#tenantId#',
+            platformId: 'harly-platform',
+            platformJwksUrl: 'https://opportunities.keepyjalive.org/api/integrations/tao/lti/jwks',
+            platformKeyChain: {},
+            toolId: 'deliver-tool',
+            toolJwksUrl: '%s/.well-known/jwks.json' % setup.apps['environment-management'].auth_server.http.url,
+            toolKeyChain: {},
           },
         ],
         ltiRoleMappings: [
