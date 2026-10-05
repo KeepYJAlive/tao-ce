@@ -47,6 +47,13 @@ configs:
       spec:
         publicDomain: ${TAO_CE_PUBLIC_ORIGIN:-community.tao.internal:8443}
         defaultLocale: ${TAO_CE_DEFAULT_LOCALE:-en-US}
+        contentStorage:
+          type: ${TAO_CONTENT_STORAGE_TYPE:-filesystem}
+          projectId: ${TAO_GCP_PROJECT_ID:-}
+          bucketName: ${TAO_GCS_BUCKET_NAME:-}
+          bucketDirectory: ${TAO_GCS_BUCKET_DIRECTORY:-content-service}
+          linkTtlMinutes: ${TAO_GCS_LINK_TTL_MINUTES:-10}
+          signRequired: ${TAO_GCS_SIGN_REQUIRED:-true}
         dependencies:
         - key: pubsub
           type: pubsub

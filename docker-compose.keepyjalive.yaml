@@ -1,0 +1,9 @@
+services:
+  tao:
+    image: ghcr.io/keepyjalive/tao-ce:latest
+    ports:
+      - "127.0.0.1:8443:443"
+
+  pgsql:
+    profiles:
+      - local-postgres
