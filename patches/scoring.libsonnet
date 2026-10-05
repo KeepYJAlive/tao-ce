@@ -60,7 +60,6 @@ function(setup)
         EM_SIDECAR_PORT: setup.apps['environment-management'].auth_server.grpc.port,
         EM_AUTH_SERVER_GRPC_GATEWAY_HOST: setup.apps['environment-management'].auth_server.gw.url,
         DYNAMIC_QUERY_API_URL: setup.apps.dynamic_query.api.http.url,
-        AI_API_URL: setup.apps.ai.backend.http.url,
         CONTENT_API_URL: setup.apps['content-service'].backend.http.url,
       },
       frontend: {
