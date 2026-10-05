@@ -15,3 +15,6 @@ RUN sed -i \
     && sed -i \
       '1s/TAO_CE_PUBLIC_DOMAIN/TAO_CE_PUBLIC_HOST/' \
       /etc/tao-ce/config/Caddyfile
+
+COPY patches/GcsFilesystemAdapter.php \
+  /opt/tao-ce/construct/backend/taoMediaManager/model/fileManagement/GcsFilesystemAdapter.php
