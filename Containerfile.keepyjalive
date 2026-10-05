@@ -13,6 +13,9 @@ RUN sed -i \
       "/TAO_CE_PUBLIC_DOMAIN: this.publicDomain,/a\\      TAO_CE_PUBLIC_HOST: std.split(this.publicDomain, ':')[0]," \
       /usr/local/libexec/tao-ce/setup/main.jsonnet \
     && sed -i \
+      "/GOOGLE_APPLICATION_CREDENTIALS:.*gcp.json/d" \
+      /usr/local/libexec/tao-ce/setup/main.jsonnet \
+    && sed -i \
       '1s/TAO_CE_PUBLIC_DOMAIN/TAO_CE_PUBLIC_HOST/' \
       /etc/tao-ce/config/Caddyfile
 
