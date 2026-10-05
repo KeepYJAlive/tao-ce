@@ -6,6 +6,9 @@ COPY patches/construct-seed.libsonnet \
 COPY patches/scoring.libsonnet \
   /usr/local/libexec/tao-ce/setup/apps/scoring.libsonnet
 
+COPY patches/content-service.libsonnet \
+  /usr/local/libexec/tao-ce/setup/apps/content-service.libsonnet
+
 RUN sed -i \
       "/TAO_CE_PUBLIC_DOMAIN: this.publicDomain,/a\\      TAO_CE_PUBLIC_HOST: std.split(this.publicDomain, ':')[0]," \
       /usr/local/libexec/tao-ce/setup/main.jsonnet \
