@@ -37,7 +37,7 @@ jobs:
           echo "Deploying commit: ${SHA}"
           echo "Deploying image: ghcr.io/keepyjalive/tao-ce:sha-${SHORT_SHA}"
 
-      - name: Deploy Harly
+      - name: Deploy TAO
         uses: appleboy/ssh-action@v1
         env:
           DEPLOY_SHA: ${{ steps.version.outputs.sha }}
@@ -48,14 +48,13 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT }}
           envs: DEPLOY_SHA,TAO_IMAGE
-          script_stop: true
           script: |
             set -euo pipefail
 
             REPO=/opt/keepyjalive/tao/repo
             ENV_FILE=/opt/keepyjalive/tao/config/.env
 
-            echo "=== Deployment ==="
+            echo "=== TAO Deployment ==="
             echo "Commit: $DEPLOY_SHA"
             echo "Image:  $TAO_IMAGE"
 
@@ -73,47 +72,50 @@ jobs:
             echo "Repository now at:"
             git rev-parse HEAD
 
-            echo "=== Pulling deployment image ==="
             export TAO_IMAGE
-            docker compose --env-file "$ENV_FILE" pull app migrate scheduler
 
-            echo "=== Running database migrations ==="
-            docker compose --env-file "$ENV_FILE" run --rm --no-deps migrate
+            COMPOSE="docker compose \
+              --env-file $ENV_FILE \
+              -f docker-compose.yml \
+              -f docker-compose.prod.yml"
 
-            echo "=== Starting application ==="
-            docker compose --env-file "$ENV_FILE" up -d \
-              --no-deps \
-              --force-recreate \
-              app scheduler
+            echo "=== Validating production configuration ==="
+            $COMPOSE config --quiet
 
-            echo "=== Waiting for application health ==="
-            APP_CONTAINER="$(docker compose --env-file "$ENV_FILE" ps -q app)"
+            echo "=== Pulling TAO image ==="
+            $COMPOSE pull tao
 
-            if [ -z "$APP_CONTAINER" ]; then
-              echo "App container was not created."
+            echo "=== Starting TAO ==="
+            $COMPOSE up -d --force-recreate tao
+
+            echo "=== Waiting for TAO health ==="
+            TAO_CONTAINER="$($COMPOSE ps -q tao)"
+
+            if [ -z "$TAO_CONTAINER" ]; then
+              echo "TAO container was not created."
               exit 1
             fi
 
             for attempt in $(seq 1 30); do
               STATUS="$(docker inspect \
                 --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
-                "$APP_CONTAINER")"
+                "$TAO_CONTAINER")"
 
-              echo "App health: $STATUS"
+              echo "TAO health: $STATUS"
 
               if [ "$STATUS" = "healthy" ]; then
                 break
               fi
 
               if [ "$STATUS" = "unhealthy" ]; then
-                echo "Application became unhealthy."
-                docker compose --env-file "$ENV_FILE" logs --tail=100 app
+                echo "TAO became unhealthy."
+                $COMPOSE logs --tail=100 tao
                 exit 1
               fi
 
               if [ "$attempt" -eq 30 ]; then
-                echo "Timed out waiting for application health."
-                docker compose --env-file "$ENV_FILE" logs --tail=100 app
+                echo "Timed out waiting for TAO health."
+                $COMPOSE logs --tail=100 tao
                 exit 1
               fi
 
@@ -121,6 +123,6 @@ jobs:
             done
 
             echo "=== Deployment status ==="
-            docker compose --env-file "$ENV_FILE" ps
+            $COMPOSE ps
 
-            echo "Deployment completed successfully."
+            echo "TAO deployment completed successfully."
