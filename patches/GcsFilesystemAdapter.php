@@ -6,6 +6,7 @@ namespace oat\taoMediaManager\model\fileManagement;
 
 use Google\Cloud\Storage\StorageClient;
 use League\Flysystem\GoogleCloudStorage\GoogleCloudStorageAdapter;
+use League\Flysystem\GoogleCloudStorage\UniformBucketLevelAccessVisibility;
 
 /**
  * Google Cloud Storage adapter for TAO Media Manager.
@@ -28,7 +29,8 @@ class GcsFilesystemAdapter extends GoogleCloudStorageAdapter
 
         parent::__construct(
             $storage->bucket($bucketName),
-            $prefix
+            $prefix,
+            new UniformBucketLevelAccessVisibility()
         );
     }
 }
