@@ -1,5 +1,11 @@
 function(setup)
   {
+    local storage =
+      if std.objectHas(setup, 'contentStorage')
+      then setup.contentStorage
+      else { type: 'filesystem' },
+
+    local useGcp = storage.type == 'gcp',
     seed: {
       identifier: 'tao',
     },
@@ -41,9 +47,27 @@ function(setup)
           options: {
             filesPath: '%s/construct/data' % setup.dirs.varlib,
             adapters: {
-              default: { class: 'Local', options: { location: '%s/construct/data' % setup.dirs.varlib } },
-              memory: { class: 'League\\Flysystem\\InMemory\\InMemoryFilesystemAdapter' },
-            },
+              default: {
+                class: 'Local',
+                options: {
+                  location: '%s/construct/data' % setup.dirs.varlib,
+                },
+              },
+              memory: {
+                class: 'League\\Flysystem\\InMemory\\InMemoryFilesystemAdapter',
+              },
+            } + (
+              if useGcp then {
+                'gcs-media': {
+                  class: 'oat\\taoMediaManager\\model\\fileManagement\\GcsFilesystemAdapter',
+                  options: [
+                    storage.projectId,
+                    storage.bucketName,
+                    'media-manager',
+                  ],
+                },
+              } else {}
+            ),
             dirs: {
               taskQueueStorage: 'default',
               fileUploadDirectory: 'default',
@@ -65,6 +89,7 @@ function(setup)
               dataStoreQTITests: 'default',
               taoDeliverConnect: 'default',
               taoTestPreviewUILoader: 'default',
+              mediaManager: if useGcp then 'gcs-media' else 'default',
             },
           },
         },
